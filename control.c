@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
     shmem = shmget(shmemkey, sizeof(int), 0);
     file = open("story.txt", O_RDONLY);
 
-    fseek(file, 0L, SEEK_END);
+    fseek(file, 0, SEEK_END);
     int size = ftell(file);
     rewind(file);
 
