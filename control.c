@@ -7,6 +7,15 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 
+
+union semun {
+  int              val;    /* Value for SETVAL */
+  struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+  unsigned short  *array;  /* Array for GETALL, SETALL */
+  struct seminfo  *__buf;  /* Buffer for IPC_INFO
+			      (Linux-specific) */
+};
+
 int main(int argc, char *argv[]){
 
   int sem;
@@ -36,11 +45,13 @@ int main(int argc, char *argv[]){
   }
 
   else if (strncmp(argv[1], "-v", strlen(argv[1])) == 0){
-    sem = semget(key, 1, 0);
+    file = open("story.txt",O_RDONLY);
+    int size = lseek(file,0,SEEK_END);
+    lseek(file,-1*size,SEEK_CUR);
+    //rewind
+    char buf[size];
 
-    //get value of sem
-    sc = semctl(sem, 0, GETVAL);
-    printf("semaphore value: %d\n",sc);
+    read(file,buf,sizeof(buf));
   }
 
   else if(strncmp(argv[1], "-r", strlen(argv[1])) == 0){
@@ -48,9 +59,9 @@ int main(int argc, char *argv[]){
     shmem = shmget(shmemkey, sizeof(int), 0);
     file = open("story.txt", O_RDONLY);
 
-    fseek(file, 0, SEEK_END);
-    int size = ftell(file);
-    rewind(file);
+    int size = lseek(file, 0, SEEK_END);
+    //rewind(file);
+    lseek(file,-1*size,SEEK_CUR);
 
     char buf[size]; // = (char*)malloc(sizeof(char*));
 
