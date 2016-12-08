@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -54,6 +55,7 @@ int main(int argc, char *argv[]){
     char buf[size]; // = (char*)malloc(sizeof(char*));
 
     read(file,buf,sizeof(buf));
+    printf("Story:\n\n%s\n\n",buf);
     
 
     //remove sem
