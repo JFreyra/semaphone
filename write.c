@@ -23,8 +23,6 @@ int main() {
   int shmemkey = ftok("control.c", 40);
   char in[1000];
   
-  
-  printf("NUUUU\n");
 
   shmem = shmget(shmemkey, sizeof(int), 0644);
   
@@ -38,18 +36,13 @@ int main() {
     printf("Shmat error: %s\n",strerror(errno));  
   }
 
-  printf("size: %d\n",*size);
-  
-
-  file = open("story.txt",O_RDWR);
+  file = open("story.txt",O_RDWR | O_APPEND);
 
   char buf[500];
 
-  printf("wsgusdg\n");
-  
-  lseek(file,-(*size),SEEK_END);
+  int sen = lseek(file,-(*size),SEEK_END);
 
-  read(file,buf,sizeof(buf));
+  read(file,buf,sen);
 
   printf("Last line: %s\n\n",buf);
 
@@ -57,20 +50,21 @@ int main() {
   printf("Enter next line:\n");
   fgets(in,sizeof(in),stdin);
 
+
   char* line = strstr(in,"\n");
+  line++;
   *line = 0;
-
-  int i = 0;  //how many characters
-  while (in[i]) {
-    //printf("%c > ",in[i]);
-    i++;
-  }
   
-  lseek(file,0,SEEK_END);
 
-  write(file,in,i);
+  write(file,in,strlen(in));
   
-  *size += sizeof(in);
+  printf("entered%d\n",strlen(in));
+  
+  printf("*size: %d\n",*size);
+  printf("size: %p\n",size);
+  *size = strlen(in); //This seg faults
+  
+  printf("entered222\n");
 
   close(file);
 
