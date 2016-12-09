@@ -13,34 +13,31 @@
 
 
 int main() {
+
+  //use semaphores to block
+  //need to include in this file
+
   int shmem;
   int file;
   int shmemkey = ftok("control.c", 40);
   char in[1000];
   
   
-  int *size;
-  
+  printf("NUUUU\n");
 
   shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
-  size = shmat(shmem,0,0);
+  int *size = shmat(shmem,0,0);
   
-  printf("NUUU\n");
   
-  size = malloc(sizeof(int));
-  if (!*size) {
-    *size = 0;
-  }
-  
+
   file = open("story.txt",O_RDWR);
-  int f = lseek(file,0,SEEK_END);
-  lseek(file,-1*f,SEEK_CUR);
   
-  char buf[f];
+  char buf[*size];
   
-      
-  lseek(file,0,*size);
+  lseek(file,-(*size),SEEK_END);
+
   read(file,buf,sizeof(buf));
+
   printf("Last line: %s\n\n",buf);
 
 
@@ -52,7 +49,7 @@ int main() {
 
   int i = 0;  //how many characters
   while (in[i]) {
-    printf("%c > ",in[i]);
+    //printf("%c > ",in[i]);
     i++;
   }
   
@@ -61,5 +58,9 @@ int main() {
   write(file,in,i);
   
   *size += sizeof(in);
+
+  close(file);
+
+  shmdt(size);
   
 }
