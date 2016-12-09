@@ -25,12 +25,15 @@ int main(int argc, char *argv[]){
   int shmemkey = ftok("control.c", 40);
   int sh;
   int sc;
+  
+  int *size;
 
   if (strncmp(argv[1], "-c", strlen(argv[1])) == 0){
     sem = semget(semkey, 1, IPC_CREAT | IPC_EXCL | 0644);
     printf("semaphore created: %d\n", sem);
 
-    shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | 0644);
+    shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
+    size = shmat(shmem,0,0);
     printf("shared memory created: %d\n", shmem);
 
     file = open("story.txt", O_TRUNC | O_CREAT | O_RDWR, 0644);
@@ -52,6 +55,8 @@ int main(int argc, char *argv[]){
     char buf[size];
 
     read(file,buf,sizeof(buf));
+    
+    printf("Story:\n%s",buf);
   }
 
   else if(strncmp(argv[1], "-r", strlen(argv[1])) == 0){
