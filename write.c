@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sys/shm.h>
 #include <errno.h>
 
 //http://www.csl.mtu.edu/cs4411.ck/www/NOTES/process/shm/shmat.html
@@ -25,16 +26,14 @@ int main() {
   
   printf("NUUUU\n");
 
-  shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | 0644);
+  shmem = shmget(shmemkey, sizeof(int), 0644);
   
   if (shmem == -1) {
     printf("Shemem error: %s\n",strerror(errno));
   }
 
-  int *size = shmat(shmem,0,0);
-  
-  printf("dyxd\n");
-  
+  int *size = shmat(shmem,NULL,SHM_RDONLY);
+
   if (*size == -1) {
     printf("Shmat error: %s\n",strerror(errno));  
   }
