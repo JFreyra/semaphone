@@ -26,15 +26,18 @@ int main() {
   printf("NUUUU\n");
 
   shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | 0644);
-
-  printf("shmem: %d\n",shmem);
-
-  //need error checks
-  printf("err1: %s\n",strerror(errno));
+  
+  if (shmem == -1) {
+    printf("Shemem error: %s\n",strerror(errno));
+  }
 
   int *size = shmat(shmem,0,0);
   
-  printf("err2: %s\n",strerror(errno));
+  printf("dyxd\n");
+  
+  if (*size == -1) {
+    printf("Shmat error: %s\n",strerror(errno));  
+  }
 
   printf("size: %d\n",*size);
   

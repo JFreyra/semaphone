@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
     sem = semget(semkey, 1, IPC_CREAT | IPC_EXCL | 0644);
     printf("semaphore created: %d\n", sem);
 
-    shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
+    shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | 0644);
     size = shmat(shmem,0,0);
     printf("shared memory created: %d\n", shmem);
 
