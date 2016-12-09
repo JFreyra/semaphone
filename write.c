@@ -25,14 +25,25 @@ int main() {
   
   printf("NUUUU\n");
 
-  shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
+  shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | 0644);
+
+  printf("shmem: %d\n",shmem);
+
+  //need error checks
+  printf("err1: %s\n",strerror(errno));
+
   int *size = shmat(shmem,0,0);
   
+  printf("err2: %s\n",strerror(errno));
+
+  printf("size: %d\n",*size);
   
 
   file = open("story.txt",O_RDWR);
-  
-  char buf[*size];
+
+  char buf[500];
+
+  printf("wsgusdg\n");
   
   lseek(file,-(*size),SEEK_END);
 
