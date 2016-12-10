@@ -7,6 +7,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/sem.h>
+#include <errno.h>
 
 
 union semun {
@@ -26,60 +27,56 @@ int main(int argc, char *argv[]){
   int shmemkey = ftok("control.c", 40);
   int sh;
   int sc;
-  
   int *size;
 
   if (strncmp(argv[1], "-c", strlen(argv[1])) == 0){
+    //SEMAPHORE
     sem = semget(semkey, 1, IPC_CREAT | IPC_EXCL | 0644);
     printf("semaphore created: %d\n", sem);
-
-    shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | 0644);
-    size = shmat(shmem,0,0);
-    printf("shared memory created: %d\n", shmem);
-
-    file = open("story.txt", O_TRUNC | O_CREAT | O_RDWR, 0644);
-    printf("file created: %d\n", file);
-
     union semun su;
-    su.val = 1;//atoi(argv[2]);
-
-    //set sem value
+    su.val = 1;
     sc = semctl(sem, 0, SETVAL, su);
     printf("value set: %d\n", sc);
+
+    //SHARED MEMORY
+    shmem = shmget(shmemkey, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
+    if (shmem == -1) {
+      printf("Shemem error: %s\n",strerror(errno));
+    }
+    size = shmat(shmem,0,0);
+    *size = 0;
+
+    //CREATE FILE
+    file = open("story.txt", O_CREAT | O_TRUNC | O_RDWR | O_EXCL | 0644);
   }
 
   else if (strncmp(argv[1], "-v", strlen(argv[1])) == 0){
     file = open("story.txt",O_RDONLY);
-    int size = lseek(file,0,SEEK_END);
-    lseek(file,-1*size,SEEK_CUR);
-    //rewind
-    char buf[size];
-
+    int s = lseek(file,0,SEEK_END);
+    lseek(file,-1*s,SEEK_CUR);
+    char buf[s];
     read(file,buf,sizeof(buf));
-    
     printf("Story:\n%s",buf);
   }
 
   else if(strncmp(argv[1], "-r", strlen(argv[1])) == 0){
     sem = semget(semkey, 1, 0);
     shmem = shmget(shmemkey, sizeof(int), 0);
+    
     file = open("story.txt", O_RDONLY);
-
-    int size = lseek(file, 0, SEEK_END);
-    //rewind(file);
-    lseek(file,-1*size,SEEK_CUR);
-
-    char buf[size]; // = (char*)malloc(sizeof(char*));
-
+    int s = lseek(file,0,SEEK_END);
+    lseek(file,-1*s,SEEK_CUR);
+    char buf[s];
     read(file,buf,sizeof(buf));
     printf("Story:\n\n%s\n\n",buf);
+    close(file);
     
-
-    //remove sem
+    //REMOVE SEMAPHORE
     sc = semctl(sem, 0, IPC_RMID);
     printf("semaphore removed: %d\n", sc);
 
-    sh = shmctl(shmem, 0, IPC_RMID);
+    //REMOVE SHARED MEMORY
+    sh = shmctl(shmem, IPC_RMID, NULL);
     printf("shared memory removed: %d\n", sh);
   }
 
