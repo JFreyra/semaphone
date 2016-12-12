@@ -47,7 +47,7 @@ int main(int argc, char *argv[]){
     *size = 0;
 
     //CREATE FILE
-    file = open("story.txt", O_CREAT | O_TRUNC | O_RDWR | O_EXCL | 0644);
+    file = open("story.txt", O_CREAT | O_TRUNC | O_RDWR | O_EXCL, 0644);
   }
 
   else if (strncmp(argv[1], "-v", strlen(argv[1])) == 0){
