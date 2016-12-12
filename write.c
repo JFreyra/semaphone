@@ -32,7 +32,9 @@ int main() {
   struct sembuf sb;
   sb.sem_num = 0;
   sb.sem_flg = SEM_UNDO;
-  sb.sem_op = 0;
+  sb.sem_op = -1;
+    
+  semop(sem,&sb,1);
   
   //SHARED MEMORY SETUP
   shmem = shmget(shmemkey, sizeof(int), 0644);
@@ -73,5 +75,8 @@ int main() {
   
   close(file);
   shmdt(size);
+  
+  sb.sem_op = 1;
+  semop(sem,&sb,1);
   
 }
